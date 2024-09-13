@@ -1,17 +1,37 @@
-import React from 'react'
-import Card from '../Components/Card'
-
-//Este componente debera ser estilado como "dark" o "light" dependiendo del theme del Context
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Card from "../Components/Card";
 
 const Home = () => {
-  return (
-    <main className="" >
-      <h1>Home</h1>
-      <div className='card-grid'>
-        {/* Aqui deberias renderizar las cards */}
-      </div>
-    </main>
-  )
-}
+  const [dentists, setDentists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default Home
+  useEffect(() => {
+    const fetchDentists = async () => {
+      try {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+        setDentists(response.data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDentists();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div className="card-grid">
+      {dentists.map(dentist => (
+        <Card key={dentist.id} dentist={dentist} />
+      ))}
+    </div>
+  );
+};
+
+export default Home;
